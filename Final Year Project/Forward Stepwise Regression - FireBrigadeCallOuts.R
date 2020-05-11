@@ -1,0 +1,20 @@
+install.packages("MASS")
+library(MASS)
+FireBrigadeCallOuts = read.csv(file.choose())
+
+FireBrigadeCallOuts$MONTH <- as.factor(FireBrigadeCallOuts$MONTH)
+FireBrigadeCallOuts$DAY_OF_WEEK <- as.factor(FireBrigadeCallOuts$DAY_OF_WEEK)
+FireBrigadeCallOuts$DAY <- as.factor(FireBrigadeCallOuts$DAY)
+FireBrigadeCallOuts$HOUR <- as.factor(FireBrigadeCallOuts$HOUR)
+
+FitStart = glm(COUNT ~ 1, data = FireBrigadeCallOuts, family = poisson)
+pois0 <- glm(COUNT ~ STATION_AREA + DESCRIPTION + MONTH + DAY_OF_WEEK + DAY + HOUR, data = FireBrigadeCallOuts, family = poisson)
+step(FitStart, direction = "forward", scope = formula(pois0))
+
+FitStart = MASS::glm.nb(COUNT ~ 1, data = FireBrigadeCallOuts)
+nb0 <- MASS::glm.nb(COUNT ~ STATION_AREA + DESCRIPTION + MONTH + DAY_OF_WEEK + DAY + HOUR, data = FireBrigadeCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb0))
+nb1 <- MASS::glm.nb(COUNT ~ STATION_AREA + DESCRIPTION + MONTH + DAY_OF_WEEK + DAY + HOUR + TEMPERATURE + WIND_SPEED + PRECIPITATION + CLOUD_COVER, data = FireBrigadeCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb1))
+nb2 <- MASS::glm.nb(COUNT ~ STATION_AREA + DESCRIPTION + MONTH + DAY_OF_WEEK + DAY + HOUR + EVENT, data = FireBrigadeCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb2))

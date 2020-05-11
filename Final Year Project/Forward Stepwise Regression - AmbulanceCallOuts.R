@@ -1,0 +1,20 @@
+install.packages("MASS")
+library(MASS)
+AmbulanceCallOuts = read.csv(file.choose())
+
+AmbulanceCallOuts$MONTH <- as.factor(AmbulanceCallOuts$MONTH)
+AmbulanceCallOuts$DAY_OF_WEEK <- as.factor(AmbulanceCallOuts$DAY_OF_WEEK)
+AmbulanceCallOuts$DAY <- as.factor(AmbulanceCallOuts$DAY)
+AmbulanceCallOuts$HOUR <- as.factor(AmbulanceCallOuts$HOUR)
+
+FitStart = glm(COUNT ~ 1, data = AmbulanceCallOuts, family = poisson)
+pois0 <- glm(COUNT ~ STATION_AREA + CLINICAL_STATUS + MONTH + DAY_OF_WEEK + DAY + HOUR, data = AmbulanceCallOuts, family = poisson)
+step(FitStart, direction = "forward", scope = formula(pois0))
+
+FitStart = MASS::glm.nb(COUNT ~ 1, data = AmbulanceCallOuts)
+nb0 <- MASS::glm.nb(COUNT ~ STATION_AREA + CLINICAL_STATUS + MONTH + DAY_OF_WEEK + DAY + HOUR, data = AmbulanceCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb0))
+nb1 <- MASS::glm.nb(COUNT ~ STATION_AREA + CLINICAL_STATUS + MONTH + DAY_OF_WEEK + DAY + HOUR + TEMPERATURE + WIND_SPEED + PRECIPITATION + CLOUD_COVER, data = AmbulanceCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb1))
+nb2 <- MASS::glm.nb(COUNT ~ STATION_AREA + CLINICAL_STATUS + MONTH + DAY_OF_WEEK + DAY + HOUR + EVENT, data = AmbulanceCallOuts)
+step(FitStart, direction = "forward", scope = formula(nb2))
